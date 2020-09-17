@@ -22,6 +22,7 @@ let getPrice = (books) => {
         }
         price += 8 * nbSameBooks;
     }
+    
     return parseFloat(price.toFixed(2));
 
 };
