@@ -8,20 +8,20 @@ let getPrice = (books) => {
     // the books are the keys of the map, the number of copies of a book is the value.
     let mapBooks = classifyBooksIntoMap(books);
     // We get the size of each serie, and with that, we know the number of series
-    let sizeOfSeries = getSizeOfSeries(mapBooks);
-    optimizeSeries(sizeOfSeries);
-    let nbSeries = sizeOfSeries.length;
-    // if we buy more of one book, it can be outside a serie
-    let nbSameBooks = countNbBooksWithoutDiscount(mapBooks, nbSeries);
+    let series = getSeries(mapBooks);
+    series = optimizeSeries(series); // for some edge cases
+    let nbSeries = series.length;
 
      // if we have series, we apply the discount for each series, according to the size of the serie
     if (nbSeries > 0) {
         price = 0;
         for (let i = 0; i < nbSeries; i++) {
-            let discount = getDiscount(sizeOfSeries[i]);
-            price += sizeOfSeries[i] * 8 * discount;
+            let discount = getDiscount(series[i]);
+            price += series[i] * 8 * discount;
         }
-        price += 8 * nbSameBooks;
+        // if we buy more of one copy of a book, it can be outside a serie
+        let nbSameBooks = countNbBooksWithoutDiscount(mapBooks, nbSeries);
+        price += 8 * nbSameBooks; // we add the books without discount
     }
     
     return parseFloat(price.toFixed(2));
@@ -29,6 +29,7 @@ let getPrice = (books) => {
 };
 
 // The map is to have the id of the book as key, and the number of copies of this book as value.
+// Easier to work with the map than the array we have in input.
 let classifyBooksIntoMap = (books) => {
     let mapBooks = new Map();
     books.map((elt) => {
@@ -59,8 +60,8 @@ let getDiscount = (nbBooks) => {
     return discount;
 };
 
-// When we want to get the size of each series, we get the number of series.
-let getSizeOfSeries = (books) => {
+// return an array with the size of the different series
+let getSeries = (books) => {
     let mapBooks = new Map(books);
     let noMoreASerie = false;
     let sizeSeries = new Array();
@@ -81,28 +82,27 @@ let getSizeOfSeries = (books) => {
     return sizeSeries;
 };
 
-let optimizeSeries = (sizeOfSeries) => {
-    sizeOfSeries.sort();
-    if (sizeOfSeries.length === 2 && sizeOfSeries[0] === 3 && sizeOfSeries[1] === 5) {
-        sizeOfSeries[0] = 4;
-        sizeOfSeries[1] = 4;
-    } else if (sizeOfSeries.length === 5) {
+// Manage some edge case. So, specific optimiziation foe these cases.
+let optimizeSeries = (series) => {
+    let newSeries = series.sort();
+    if (newSeries.length === 2 && newSeries[0] === 3 && newSeries[1] === 5) {
+        let optimization = [4,4];
+        newSeries = [...optimization];
+    } else if (newSeries.length === 5) {
         let edgeCase = false;
-        for (let i = 0 ; i< sizeOfSeries.length ; i++) {
+        for (let i = 0 ; i< newSeries.length ; i++) {
             if (i === 0) {
-                edgeCase = sizeOfSeries[0] === 3;
+                edgeCase = newSeries[0] === 3;
             } else {
-                edgeCase = edgeCase && sizeOfSeries[i] === 5;
+                edgeCase = edgeCase && newSeries[i] === 5;
             }
         }
         if (edgeCase) {
-            sizeOfSeries[0] = 4;
-            sizeOfSeries[1] = 4;
-            sizeOfSeries[2] = 5;
-            sizeOfSeries[3] = 5;
-            sizeOfSeries[4] = 5;
+            let optimization = [4,4,5,5,5];
+            newSeries = [...optimization];
         }
     }
+    return newSeries;
 };
 
 // Count the number without discount, Like when you buy multiple times the same books:
