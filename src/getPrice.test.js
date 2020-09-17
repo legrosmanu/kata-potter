@@ -56,6 +56,13 @@ describe('getPrice', () => {
       expect(price).toBe(38);
     })
 
+    it('should just add 8 * x to the discount when x books is out of a serie', async () => {
+      let price = getPrice([1, 2, 2, 2, 2]);
+      expect(price).toBe(39.2);
+      price = getPrice([1, 2, 1, 2, 2, 2, 2]);
+      expect(price).toBe(54.4);
+    })
+
     it('should apply different discounts when we have only series with different size', async () => {
       let price = getPrice([1, 2, 1, 2, 3]);
       expect(price).toBe(36.8);
