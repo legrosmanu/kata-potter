@@ -57,6 +57,7 @@ let getDiscount = (nbBooks) => {
     return discount;
 };
 
+// When we want to get the size of each series, we get the number of series.
 let getSizeOfSeries = (books) => {
     let mapBooks = new Map(books);
     let noMoreASerie = false;
@@ -78,6 +79,8 @@ let getSizeOfSeries = (books) => {
     return sizeSeries;
 };
 
+// Count the number without discount, Like when you buy multiple times the same books:
+// 2,2,2 -> 3 without discount or 1,2,2,2, -> 2 without discount...
 let countNbBooksWithoutDiscount = (books, nbSeries) => {
     let mapBooks = new Map(books);
     for (const [key, value] of mapBooks) {
